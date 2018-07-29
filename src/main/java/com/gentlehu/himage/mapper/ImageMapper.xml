@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.gentlehu.himage.mapper.ImageMapper">
+
+    <resultMap id="imageResultMap" type="com.gentlehu.himage.pojo.Image">
+        <id column="id" property="id"/>
+        <result column="uid" property="uid"/>
+        <result column="relpath" property="relpath"/>
+        <result column="location" property="location"/>
+        <result column="create_time" property="createTime"/>
+        <result column="status" property="status"/>
+    </resultMap>
+
+    <sql id="all_column">id,uid,relpath,location,create_time,status</sql>
+    
+    
+    <insert id="insert" parameterType="com.gentlehu.himage.pojo.Image">
+        insert into image(id,uid,relpath,location)
+        values(#{id},#{uid},#{relpath},#{location})
+    </insert>
+
+    <update id="update">
+        update image
+        <set>
+            <if test="image.uid != null">
+                uid = #{image.uid},
+            </if>
+            <if test="image.relpath != null">
+                relpath = #{image.relpath},
+            </if>
+            <if test="image.location != null">
+                location = #{image.location},
+            </if>
+            <if test="image.relpath != null">
+                relpath = #{image.relpath},
+            </if>
+            <if test="image.createTime != null">
+                create_time = #{image.createTime},
+            </if>
+            <if test="image.status != null">
+                status = #{image.status},
+            </if>
+
+        </set>
+        where id = #{id}
+    </update>
+
+    <select id="findById" parameterType="java.lang.String" resultMap="imageResultMap">
+        select <include refid="all_column"/> from image where id = #{id}
+    </select>
+    <select id="findByUid" parameterType="java.lang.String" resultMap="imageResultMap">
+        select <include refid="all_column"/> from image where uid = #{uid}
+    </select>
+    <select id="count" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select  count(*) from image
+        <if test="column != null">
+            where ${column} = #{value}
+        </if>
+    </select>
+
+    <cache eviction="FIFO"
+           readOnly="true"
+           size="32"
+           flushInterval="60000"/>
+
+</mapper>

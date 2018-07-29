@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.gentlehu.himage.mapper.UserMapper">
+    
+    <resultMap id="userResultMap" type="com.gentlehu.himage.pojo.User">
+        <id column="uid" property="uid"/>
+        <result column="username" property="username"/>
+        <result column="password" property="password"/>
+        <result column="email" property="email"/>
+        <result column="create_time" property="createTime"/>
+        <result column="status" property="status"/>
+    </resultMap>
+    
+    <sql id="all_column">uid,username,password,email,create_time,status</sql>
+    <insert id="insert" parameterType="com.gentlehu.himage.pojo.User">
+        insert into image(uid,username,password,email)
+        values(#{user.uid},#{user.username},#{user.password},#{user.email})
+    </insert>
+
+    <update id="update">
+        update user
+        <set>
+            <if test="user.username != null">
+                username = #{user.username},
+            </if>
+            <if test="user.password != null">
+                password = #{user.password},
+            </if>
+            <if test="user.email != null">
+                email = #{user.email},
+            </if>
+            <if test="user.createTime != null">
+                create_time = #{image.createTime},
+            </if>
+            <if test="user.status != null">
+                user = #{user.status},
+            </if>
+
+        </set>
+        where uid = #{uid}
+    </update>
+
+    <select id="findByUid" parameterType="java.lang.String" resultMap="userResultMap">
+        select <include refid="all_column"/> from user where uid = #{uid}
+    </select>
+    <!--模糊查询-->
+    <select id="findByUsernameLike" parameterType="java.lang.String" resultMap="userResultMap">
+        select <include refid="all_column"/> from user where username like concat('%',#{username},'%')
+    </select>
+    <select id="findByUsername" parameterType="java.lang.String" resultMap="userResultMap">
+        select <include refid="all_column"/> from user where username = #{username}
+    </select>
+    <select id="count" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select  count(*) from user
+        <if test="column != null">
+            where ${column} = #{value}
+        </if>
+    </select>
+
+    <cache eviction="FIFO"
+           readOnly="true"
+           size="32"
+           flushInterval="60000"/>
+
+</mapper>
