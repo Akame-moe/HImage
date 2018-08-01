@@ -9,12 +9,17 @@ import com.gentlehu.himage.utils.TextUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -34,13 +39,13 @@ public class ApiImageController extends BaseController{
     private static final String PATTERN = "%04d/%02d/%02d";
 
 
-    @RequestMapping(value = "/api/image",method = RequestMethod.GET)
+    @RequestMapping(value = "/api/query",method = RequestMethod.GET)
     public String findById(String id){
         Image image = imageService.findById(id);
         return JsonResult.ok(image).json();
     }
-    @RequestMapping(value = "/api/image",method = RequestMethod.POST)
-    public String insert(@RequestParam("file") MultipartFile file) throws IOException {
+    @RequestMapping(value = "/api/upload",method = RequestMethod.POST)
+    public String insert(@RequestParam("src_file") MultipartFile file) throws IOException {
         if(file.isEmpty()){
             return JsonResult.error("file could't be empty.").json();
         }
@@ -64,10 +69,17 @@ public class ApiImageController extends BaseController{
         //匿名的uid定义为anonymous
         image.setUid("anonymous");
         imageService.insert(image);
-        return JsonResult.ok().json();
+        Map<String,String> m = new HashMap<>();
+        m.put("filename","test.jpg");
+        m.put("storename","storename.jpg");
+        m.put("path","/upload/images/test.jpg");
+        m.put("hash","hash_abc");
+        m.put("url","http://www.google.com/upload/images/test.jpg");
+        m.put("delete","http://www.google.com/api/delete/test");
+        return JsonResult.ok(m).json();
     }
 
-    @RequestMapping(value = "/api/image",method = RequestMethod.DELETE)
+    @RequestMapping(value = "/api/delete",method = RequestMethod.GET)
     public String delete(String id){
         Image image = imageService.findById(id);
         if(image == null){
