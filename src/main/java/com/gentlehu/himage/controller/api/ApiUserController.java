@@ -47,7 +47,7 @@ public class ApiUserController extends BaseController {
         User user = userService.findByUsername(username);
         if(user != null && user.getPassword().equals(password)){
             String token = TokenPool.generateToken(user);
-            TokenPool.put(token,user);
+            TokenPool.put(token,user.getUid());
             response.addCookie(new Cookie("_token",token));
             return JsonResult.ok().json();
         }
