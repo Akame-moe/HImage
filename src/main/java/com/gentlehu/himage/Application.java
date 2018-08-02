@@ -4,6 +4,7 @@ import com.gentlehu.himage.common.GlobalExceptionHandler;
 import com.gentlehu.himage.common.JsonResultHttpMessageConverter;
 import com.gentlehu.himage.interceptor.AuthorizedInterceptor;
 import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.amqp.core.Queue;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -19,7 +20,6 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import javax.servlet.MultipartConfigElement;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -75,11 +75,11 @@ public class Application{
     public CommandLineRunner commandLineRunner(ApplicationContext ctx){
         return args -> {
             System.out.println("Let's inspect the beans provided by Spring Boot:");
-            String[] beanNames = ctx.getBeanDefinitionNames();
-            Arrays.sort(beanNames);
-            for (String beanName : beanNames) {
-                System.out.println(beanName);
-            }
+//            String[] beanNames = ctx.getBeanDefinitionNames();
+//            Arrays.sort(beanNames);
+//            for (String beanName : beanNames) {
+//                System.out.println(beanName);
+//            }
         };
     }
 
