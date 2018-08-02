@@ -1,4 +1,4 @@
-package com.gentlehu.himage.base;
+package com.gentlehu.himage.common;
 
 import com.gentlehu.himage.entity.JsonResult;
 import org.apache.log4j.Logger;

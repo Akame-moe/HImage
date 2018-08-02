@@ -1,7 +1,8 @@
 package com.gentlehu.himage.controller.api;
 
-import com.gentlehu.himage.base.BaseController;
-import com.gentlehu.himage.base.TokenPool;
+import com.gentlehu.himage.Config;
+import com.gentlehu.himage.common.BaseController;
+import com.gentlehu.himage.common.TokenPool;
 import com.gentlehu.himage.entity.JsonResult;
 import com.gentlehu.himage.pojo.User;
 import com.gentlehu.himage.service.UserService;
@@ -30,8 +31,8 @@ public class ApiUserController extends BaseController {
     @Autowired
     private UserService userService;
 
-    @RequestMapping(value = "/api/user",method = RequestMethod.POST)
-    public String register(String username,String password,String email){
+    @RequestMapping(value = "/api/user/register",method = RequestMethod.POST)
+    public JsonResult register(String username,String password,String email){
         User user = new User();
         int hashCode = UUID.randomUUID().hashCode();
         user.setUid(String.valueOf(hashCode));
@@ -39,27 +40,27 @@ public class ApiUserController extends BaseController {
         user.setPassword(password);
         user.setEmail(email);
         userService.insert(user);
-        return JsonResult.ok().json();
+        return JsonResult.ok();
     }
 
     @RequestMapping(value = "/api/user/login",method = RequestMethod.POST)
-    public String login(@RequestParam("username") String username, String password, HttpServletResponse response){
+    public JsonResult login(@RequestParam("username") String username, String password, HttpServletResponse response){
         User user = userService.findByUsername(username);
         if(user != null && user.getPassword().equals(password)){
             String token = TokenPool.generateToken(user);
             TokenPool.put(token,user.getUid());
-            response.addCookie(new Cookie("_token",token));
-            return JsonResult.ok().json();
+            response.addCookie(new Cookie(Config.TOKEN_NAME,token));
+            return JsonResult.ok();
         }
-        return JsonResult.error("user not found.").json();
+        return JsonResult.error("user not found.");
     }
 
-    @RequestMapping(value = "/api/logout",method = RequestMethod.GET)
-    public String logout(HttpServletRequest request){
+    @RequestMapping(value = "/api/user/logout",method = RequestMethod.GET)
+    public JsonResult logout(HttpServletRequest request){
         String token = HttpUtil.fetchToken(request);
         if(!TextUtil.isEmpty(token)){
             TokenPool.remove(token);
         }
-        return JsonResult.ok().json();
+        return JsonResult.ok();
     }
 }

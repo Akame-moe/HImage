@@ -2,7 +2,7 @@ package com.gentlehu.himage.interceptor;
 
 import com.gentlehu.himage.Config;
 import com.gentlehu.himage.annotation.Authorized;
-import com.gentlehu.himage.base.TokenPool;
+import com.gentlehu.himage.common.TokenPool;
 import com.gentlehu.himage.utils.TextUtil;
 import org.apache.log4j.Logger;
 import org.springframework.web.method.HandlerMethod;

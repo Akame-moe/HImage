@@ -1,6 +1,6 @@
 package com.gentlehu.himage.controller.api;
 
-import com.gentlehu.himage.base.BaseController;
+import com.gentlehu.himage.common.BaseController;
 import com.gentlehu.himage.entity.JsonResult;
 import com.gentlehu.himage.entity.StatusCode;
 import com.gentlehu.himage.pojo.Image;
@@ -27,7 +27,7 @@ import java.util.UUID;
  * Email:me@gentlehu.com
  */
 @RestController
-@RequestMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+@RequestMapping(value ="/api/image", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 public class ApiImageController extends BaseController{
 
     @Value("${upload.imageLocation}")
@@ -36,24 +36,24 @@ public class ApiImageController extends BaseController{
     @Autowired
     private ImageService imageService;
 
-    private static final String PATTERN = "%04d/%02d/%02d";
+    private static final String DATE_PATH_PATTERN = "%04d/%02d/%02d";
 
 
-    @RequestMapping(value = "/api/query",method = RequestMethod.GET)
-    public String findById(String id){
+    @RequestMapping(value = "/query",method = RequestMethod.GET)
+    public JsonResult query(@RequestParam String id){
         Image image = imageService.findById(id);
-        return JsonResult.ok(image).json();
+        return JsonResult.ok(image);
     }
-    @RequestMapping(value = "/api/upload",method = RequestMethod.POST)
-    public String insert(@RequestParam("src_file") MultipartFile file) throws IOException {
+    @RequestMapping(value = "/upload",method = RequestMethod.POST)
+    public JsonResult upload(@RequestParam("src_file") MultipartFile file) throws IOException {
         if(file.isEmpty()){
-            return JsonResult.error("file could't be empty.").json();
+            return JsonResult.error("file could't be empty.");
         }
         LocalDateTime now = LocalDateTime.now();
-        String p = String.format(PATTERN,now.getYear(),now.getMonthValue(),now.getDayOfMonth());
+        String p = String.format(DATE_PATH_PATTERN,now.getYear(),now.getMonthValue(),now.getDayOfMonth());
         File parent = new File(imageLocation,p);
         if(!parent.exists() && !parent.mkdirs()){
-            return JsonResult.error("can't mkdirs.").json();
+            return JsonResult.error("can't mkdirs.");
         }
 
         String originName = file.getOriginalFilename();
@@ -70,17 +70,15 @@ public class ApiImageController extends BaseController{
         image.setUid("anonymous");
         imageService.insert(image);
         Map<String,String> m = new HashMap<>();
-        m.put("filename","test.jpg");
-        m.put("storename","storename.jpg");
         m.put("path","/upload/images/test.jpg");
         m.put("hash","hash_abc");
         m.put("url","http://www.google.com/upload/images/test.jpg");
         m.put("delete","http://www.google.com/api/delete/test");
-        return JsonResult.ok(m).json();
+        return JsonResult.ok(m);
     }
 
-    @RequestMapping(value = "/api/delete",method = RequestMethod.GET)
-    public String delete(String id){
+    @RequestMapping(value = "/delete",method = RequestMethod.GET)
+    public JsonResult delete(@RequestParam String id){
         Image image = imageService.findById(id);
         if(image == null){
             JsonResult.error("not found.").json();
@@ -90,10 +88,10 @@ public class ApiImageController extends BaseController{
             imageService.update(id,img);
             File file = new File(image.getLocation());
             if(file.delete()){
-                JsonResult.ok().json();
+                JsonResult.ok();
             }
         }
-        return JsonResult.error("delete error.").json();
+        return JsonResult.error("delete error.");
     }
 
 

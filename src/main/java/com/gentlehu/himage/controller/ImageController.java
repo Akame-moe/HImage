@@ -1,6 +1,6 @@
 package com.gentlehu.himage.controller;
 
-import com.gentlehu.himage.base.BaseController;
+import com.gentlehu.himage.common.BaseController;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
