@@ -3,12 +3,13 @@ package com.gentlehu.himage;
 import com.gentlehu.himage.common.GlobalExceptionHandler;
 import com.gentlehu.himage.common.JsonResultHttpMessageConverter;
 import com.gentlehu.himage.interceptor.AuthorizedInterceptor;
+import com.gentlehu.himage.interceptor.HttpCodeInterceptor;
 import org.mybatis.spring.annotation.MapperScan;
-import org.springframework.amqp.core.Queue;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration;
 import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
 import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration;
 import org.springframework.boot.web.servlet.MultipartConfigFactory;
@@ -27,7 +28,7 @@ import java.util.List;
  * Email:me@gentlehu.com
  */
 
-@EnableAutoConfiguration(exclude = {RedisAutoConfiguration.class, ThymeleafAutoConfiguration.class})
+@EnableAutoConfiguration(exclude = {RedisAutoConfiguration.class, ThymeleafAutoConfiguration.class, RabbitAutoConfiguration.class})
 @SpringBootApplication
 @MapperScan("com.gentlehu.himage.mapper")
 public class Application{
@@ -53,6 +54,7 @@ public class Application{
             public void addInterceptors(InterceptorRegistry registry) {
                 super.addInterceptors(registry);
                 registry.addInterceptor(new AuthorizedInterceptor());
+                registry.addInterceptor(new HttpCodeInterceptor());
             }
 
             @Override

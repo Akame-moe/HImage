@@ -20,6 +20,8 @@ import javax.servlet.http.HttpServletResponse;
 public class AuthorizedInterceptor implements HandlerInterceptor {
 
     private static Logger logger = Logger.getLogger(AuthorizedInterceptor.class);
+
+    //true:放行 false:拦截
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         if(!(handler instanceof HandlerMethod)) return true;
@@ -52,7 +54,7 @@ public class AuthorizedInterceptor implements HandlerInterceptor {
                 response.sendError(403,"unauthorized for this api.");
             }else{
                 logger.info("response sendRedirect to /admin/login");
-                response.sendRedirect("/admin/login");
+                response.sendRedirect("/login");
             }
             return false;
         }

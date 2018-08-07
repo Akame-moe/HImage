@@ -1,4 +1,4 @@
-package com.gentlehu.himage.rabbitmq;
+package sometest.rabbitmq;
 
 import org.apache.log4j.Logger;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;

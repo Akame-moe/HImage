@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>登陆</title>
+  <link href="css/bootstrap.min.css"/>
+  <script src="static/js/jquery-3.1.0.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/crypto-js.min.js"></script>
+</head>
+<body>
+<div id="login-box" class="form-control">
+    用户名：
+    <input id="username" name="username" class="" type="text" placeholder=""/>
+
+    密码：
+    <input id="password" name="password" type="password"/>
+    提交：
+    <input type="submit" id="submit">
+    <hr>
+    <a href="/">首页</a><a href="/register">注册</a>
+</div>
+<script>
+  $(document).ready(function () {
+
+    $("#submit").click(function () {
+      var u = $("#username").val();
+      var p = $("#password").val();
+      var pwd = CryptoJS.MD5("alisa:"+u+":"+p).toString();
+      $.ajax({
+        url:"/api/user/login",
+        type:"post",
+        data:{
+          username:u,
+          password:pwd
+        },
+        success:function (resp) {
+          console.log(resp);
+          if(resp.code == 0){
+            console.log("登陆成功");
+            location.href = "/";
+          }
+
+        },
+        error:function (err) {
+          alert("connect server failed->"+err);
+        }
+      })
+    });
+  });
+
+</script>
+</body>
+</html>

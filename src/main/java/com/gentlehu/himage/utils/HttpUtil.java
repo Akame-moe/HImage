@@ -13,8 +13,8 @@ public class HttpUtil {
 
     public static String fetchToken(HttpServletRequest request){
         String token = request.getHeader(Config.TOKEN_NAME);
-        if(TextUtil.isEmpty(token)){
-            Cookie[] cookies = request.getCookies();
+        Cookie[] cookies = request.getCookies();
+        if(TextUtil.isEmpty(token) && cookies != null){
             for (Cookie cookie : cookies) {
                 if(Config.TOKEN_NAME.equals(cookie.getName())){
                     return cookie.getValue();

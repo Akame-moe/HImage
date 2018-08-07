@@ -1,6 +1,7 @@
 package com.gentlehu.himage.mapper;
 
 import com.gentlehu.himage.pojo.User;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -11,10 +12,10 @@ import java.util.List;
  */
 @Repository("userMapper")
 public interface UserMapper {
-    User findByUid(String uid);
-    User findByUsername(String username);
-    List<User> findByUsernameLike(String username);
-    void insert(User user);
-    void update(String uid,User user);
-    int count(String column,String value);
+    User findByUid(@Param("uid") String uid);
+    User findByUsername(@Param("username") String username);
+    List<User> findByUsernameLike(@Param("username") String username);
+    void insert(@Param("user") User user);
+    void update(@Param("uid") String uid,@Param("user") User user);
+    int count(@Param("column") String column,@Param("value") String value);
 }

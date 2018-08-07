@@ -1,7 +1,6 @@
 package com.gentlehu.himage.controller.api;
 
 import com.gentlehu.himage.Config;
-import com.gentlehu.himage.common.BaseController;
 import com.gentlehu.himage.common.TokenPool;
 import com.gentlehu.himage.entity.JsonResult;
 import com.gentlehu.himage.pojo.User;
@@ -18,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.UUID;
 
 /**
  * Created by gentle-hu on 2018/7/29 10:35.
@@ -26,16 +24,18 @@ import java.util.UUID;
  */
 @RestController
 @RequestMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-public class ApiUserController extends BaseController {
+public class ApiUserController {
 
     @Autowired
     private UserService userService;
 
     @RequestMapping(value = "/api/user/register",method = RequestMethod.POST)
-    public JsonResult register(String username,String password,String email){
+    public JsonResult register(@RequestParam("username") String username,
+                               @RequestParam("password") String password,
+                               @RequestParam("email") String email){
         User user = new User();
-        int hashCode = UUID.randomUUID().hashCode();
-        user.setUid(String.valueOf(hashCode));
+        String uid = TextUtil.generateUID();
+        user.setUid(uid);
         user.setUsername(username);
         user.setPassword(password);
         user.setEmail(email);
@@ -44,23 +44,36 @@ public class ApiUserController extends BaseController {
     }
 
     @RequestMapping(value = "/api/user/login",method = RequestMethod.POST)
-    public JsonResult login(@RequestParam("username") String username, String password, HttpServletResponse response){
+    public JsonResult login(@RequestParam("username") String username,
+                            @RequestParam("password") String password, HttpServletResponse response){
         User user = userService.findByUsername(username);
         if(user != null && user.getPassword().equals(password)){
             String token = TokenPool.generateToken(user);
             TokenPool.put(token,user.getUid());
-            response.addCookie(new Cookie(Config.TOKEN_NAME,token));
+            Cookie cookie = new Cookie(Config.TOKEN_NAME, token);
+            cookie.setPath("/");
+            cookie.setMaxAge(Config.COOKIE_MAX_AGE);
+            response.addCookie(cookie);
             return JsonResult.ok();
         }
         return JsonResult.error("user not found.");
     }
 
-    @RequestMapping(value = "/api/user/logout",method = RequestMethod.GET)
-    public JsonResult logout(HttpServletRequest request){
+
+
+    @RequestMapping(value = "/api/user/online",method = RequestMethod.POST)
+    public JsonResult info(HttpServletRequest request){
         String token = HttpUtil.fetchToken(request);
-        if(!TextUtil.isEmpty(token)){
-            TokenPool.remove(token);
+        if(TextUtil.isNotEmpty(token)){
+            String uid = TokenPool.get(token);
+            if(TextUtil.isNotEmpty(uid)){
+                User user = userService.findByUid(uid);
+                user.setPassword(null);
+                return JsonResult.ok(user);
+            }
         }
-        return JsonResult.ok();
+        return JsonResult.error("not online.");
     }
+
+
 }

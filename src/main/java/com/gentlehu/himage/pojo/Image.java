@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
  */
 @Data
 public class Image {
-    private String id;
+    private Integer id;
     private String uid;
     private String relpath;
     private String location;

@@ -1,10 +1,14 @@
 package com.gentlehu.himage.controller.api;
 
-import com.gentlehu.himage.common.BaseController;
+import com.gentlehu.himage.Config;
+import com.gentlehu.himage.annotation.Authorized;
+import com.gentlehu.himage.common.TokenPool;
 import com.gentlehu.himage.entity.JsonResult;
 import com.gentlehu.himage.entity.StatusCode;
 import com.gentlehu.himage.pojo.Image;
 import com.gentlehu.himage.service.ImageService;
+import com.gentlehu.himage.service.UserService;
+import com.gentlehu.himage.utils.HttpUtil;
 import com.gentlehu.himage.utils.TextUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,20 +19,21 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
+import java.util.Optional;
 
 /**
  * Created by gentle-hu on 2018/7/29 0:06.
  * Email:me@gentlehu.com
  */
 @RestController
-@RequestMapping(value ="/api/image", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-public class ApiImageController extends BaseController{
+@RequestMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+public class ApiImageController{
 
     @Value("${upload.imageLocation}")
     private String imageLocation;
@@ -36,16 +41,21 @@ public class ApiImageController extends BaseController{
     @Autowired
     private ImageService imageService;
 
+    @Autowired
+    private UserService userService;
+
     private static final String DATE_PATH_PATTERN = "%04d/%02d/%02d";
 
 
-    @RequestMapping(value = "/query",method = RequestMethod.GET)
-    public JsonResult query(@RequestParam String id){
+    @Authorized
+    @RequestMapping(value = "/api/image/query",method = RequestMethod.GET)
+    public JsonResult query(@RequestParam Integer id){
         Image image = imageService.findById(id);
         return JsonResult.ok(image);
     }
-    @RequestMapping(value = "/upload",method = RequestMethod.POST)
-    public JsonResult upload(@RequestParam("src_file") MultipartFile file) throws IOException {
+    @Authorized
+    @RequestMapping(value = "/api/image/upload",method = RequestMethod.POST)
+    public JsonResult upload(@RequestParam("src_file") MultipartFile file, HttpServletRequest request) throws IOException {
         if(file.isEmpty()){
             return JsonResult.error("file could't be empty.");
         }
@@ -60,28 +70,33 @@ public class ApiImageController extends BaseController{
         String destName = System.currentTimeMillis() + TextUtil.suffix(originName);
         File destFile = new File(parent,destName);
         file.transferTo(destFile);
+        String path = String.format("upload/%s/%s",p,destName);
         Image image = new Image();
-        int hash = UUID.randomUUID().hashCode();
-        //暂时这样取hash值，日后改为计算文件md5
-        image.setId(String.valueOf(hash));
-        image.setRelpath(p + "/" + destName);
+        image.setRelpath(path);
         image.setLocation(destFile.getAbsolutePath());
         //匿名的uid定义为anonymous
-        image.setUid("anonymous");
+        String token = HttpUtil.fetchToken(request);
+        if(TextUtil.isNotEmpty(token)){
+            String uid = Optional.ofNullable(TokenPool.get(token)).orElse("anonymous");
+            image.setUid(uid);
+        }else{
+            image.setUid("anonymous");
+        }
         imageService.insert(image);
         Map<String,String> m = new HashMap<>();
-        m.put("path","/upload/images/test.jpg");
-        m.put("hash","hash_abc");
-        m.put("url","http://www.google.com/upload/images/test.jpg");
-        m.put("delete","http://www.google.com/api/delete/test");
+        m.put("path",path);
+        m.put("id","image_Id");
+        m.put("url",String.format("%s/%s", Config.STATIC_IMAGE_SERVER,path));
+        m.put("delete","http://www.google.com/api/image/delete/images_id");
         return JsonResult.ok(m);
     }
 
-    @RequestMapping(value = "/delete",method = RequestMethod.GET)
-    public JsonResult delete(@RequestParam String id){
+    @Authorized
+    @RequestMapping(value = "/api/image/delete",method = RequestMethod.GET)
+    public JsonResult delete(@RequestParam Integer id){
         Image image = imageService.findById(id);
         if(image == null){
-            JsonResult.error("not found.").json();
+            return JsonResult.error("not found.");
         }else{
             Image img = new Image();
             img.setStatus(StatusCode.INVALID);
@@ -90,8 +105,8 @@ public class ApiImageController extends BaseController{
             if(file.delete()){
                 JsonResult.ok();
             }
+            return JsonResult.error("delete error.");
         }
-        return JsonResult.error("delete error.");
     }
 
 

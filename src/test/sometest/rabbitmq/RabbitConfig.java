@@ -1,4 +1,4 @@
-package com.gentlehu.himage.rabbitmq;
+package sometest.rabbitmq;
 
 import org.springframework.amqp.core.Queue;
 import org.springframework.context.annotation.Bean;

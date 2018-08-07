@@ -9,10 +9,10 @@ import java.util.List;
  * Email:me@gentlehu.com
  */
 public interface ImageService {
-    Image findById(String id);
+    Image findById(int id);
     List<Image> findByUid(String uid);
     void insert(Image image);
-    void update(String id,Image image);
+    void update(Integer id,Image image);
     int count(String column,String value);
     int count();
 }

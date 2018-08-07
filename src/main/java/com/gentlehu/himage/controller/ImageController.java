@@ -1,6 +1,5 @@
 package com.gentlehu.himage.controller;
 
-import com.gentlehu.himage.common.BaseController;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -10,10 +9,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
  */
 
 @Controller
-public class ImageController extends BaseController {
+public class ImageController {
 
     @RequestMapping(value = {"/index","/"})
     public String index(){
         return "/static/index.html";
     }
+
+    @RequestMapping("/image/history")
+    public String history(){
+        return "/static/history.html";
+    }
+
 }

@@ -1,5 +1,5 @@
 create table if not exists image(
-  id char(12) not null primary key,
+  id int(8) not null primary key,
   uid char(12),
   relpath varchar(128) not null, -- 相对url路径
   location varchar(128) not null,

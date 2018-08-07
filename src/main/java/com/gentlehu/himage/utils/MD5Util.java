@@ -8,6 +8,11 @@ import java.security.NoSuchAlgorithmException;
  * Email:me@gentlehu.com
  */
 public class MD5Util {
+    private static final char[] hexDigits;
+    static {
+        hexDigits = "0123456789abcdef".toCharArray();
+    }
+
     public static String digest(String str) {
         try {
             MessageDigest md5 = MessageDigest.getInstance("MD5");
@@ -18,16 +23,18 @@ public class MD5Util {
         }
         return "";
     }
+
+
     private static String byte2hex(byte[] bytes){
-        StringBuilder sb = new StringBuilder();
-        String temp;
+        StringBuilder sb = new StringBuilder(bytes.length*2);
         for (int i = 0;i<bytes.length;i++){
-            temp = Integer.toHexString(bytes[i] & 0xFF);
-            if(temp.length() == 1){
-                sb.append("0");//不足两位补0
-            }
-            sb.append(temp);
+            sb.append(hexDigits[(bytes[i] >> 4) & 0xF]);
+            sb.append(hexDigits[bytes[i] & 0xF]);
         }
         return sb.toString();
+    }
+
+    public static void main(String[] args) {
+        System.out.println(MD5Util.digest("alisa"));
     }
 }

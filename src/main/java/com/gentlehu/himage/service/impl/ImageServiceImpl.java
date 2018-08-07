@@ -21,7 +21,7 @@ public class ImageServiceImpl implements ImageService {
     private ImageMapper imageMapper;
 
     @Override
-    public Image findById(String id) {
+    public Image findById(int id) {
         return imageMapper.findById(id);
     }
 
@@ -36,7 +36,7 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    public void update(String id, Image image) {
+    public void update(Integer id, Image image) {
         imageMapper.update(id,image);
     }
 
