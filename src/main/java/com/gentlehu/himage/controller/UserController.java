@@ -3,16 +3,19 @@ package com.gentlehu.himage.controller;
 import com.gentlehu.himage.Config;
 import com.gentlehu.himage.annotation.Authorized;
 import com.gentlehu.himage.common.TokenPool;
+import com.gentlehu.himage.utils.GsonUtil;
 import com.gentlehu.himage.utils.HttpUtil;
 import com.gentlehu.himage.utils.TextUtil;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * Created by gentle-hu on 2018/7/29 11:59.
@@ -46,6 +49,15 @@ public class UserController {
             response.sendRedirect("/");
         } catch (IOException e) {
         }
+    }
+
+    @RequestMapping("/test")
+    @ResponseBody
+    public String test(HttpServletRequest request){
+        Map<String, String[]> parameterMap = request.getParameterMap();
+        String ip = request.getRemoteAddr();
+        System.out.println("IP:"+ip);
+        return GsonUtil.toJson(parameterMap);
     }
 
 }

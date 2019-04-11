@@ -10,7 +10,7 @@ import redis.clients.jedis.Jedis;
  * Email:me@gentlehu.com
  */
 public class TokenPool {
-    private static final int EXPIRE_SECOND = 60 * 60 * 1000;//60min
+    private static final int EXPIRE_SECOND = 3600;//60min
 
     private static final String SALT = "gentlehu";
 
